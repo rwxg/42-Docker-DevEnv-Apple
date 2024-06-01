@@ -5,4 +5,6 @@ docker build --build-arg USER=$USER -t develop-env .
 # docker build --progress=plain --build-arg USER=$USER -t develop-env .
 # docker exec -it -u leayeh <container_id> /bin/bash
 echo "USER=$(whoami)" > .env
+echo "UID=$(id -u)" >> .env
+echo "GID=$(id -g)" >> .env
 docker-compose up --build -d run-container

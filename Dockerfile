@@ -31,7 +31,7 @@ RUN wget http://ftp.gnu.org/gnu/make/make-4.3.tar.gz && \
 
 # Create a virtual environment and activate it
 RUN python3 -m venv /opt/venv
-RUN chown -R $USER:$USER /opt/venv
+#RUN chown -R $USER:$USER /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Upgrade pip and setuptools and install norminette
@@ -39,16 +39,15 @@ RUN python3 -m pip install --upgrade pip setuptools
 RUN python3 -m pip install norminette
 
 # Install MLX library
-RUN cd $HOME && \
-    git clone https://github.com/42Paris/minilibx-linux.git && \
-    cd minilibx-linux && \
+RUN git clone clone https://github.com/42Paris/minilibx-linux.git /opt/minilibx-linux && \
+    cd /opt/minilibx-linux && \
     make && \
     sudo cp mlx.h /usr/local/include && \
     sudo cp libmlx.a /usr/local/lib
 
 # Clone and build Criterion
-RUN git clone --recursive https://github.com/Snaipe/Criterion.git /home/$USER/Criterion && \
-    cd /home/$USER/Criterion && \
+RUN git clone --recursive https://github.com/Snaipe/Criterion.git /opt/Criterion && \
+    cd /opt/Criterion && \
     meson setup build && \
     ninja -C build && \
     sudo ninja -C build install
@@ -67,10 +66,10 @@ RUN bash -c "$(curl -fsSL https://raw.github.com/xicodomingues/francinette/maste
 
 # Set up the user as a sudoer
 ARG USER
-RUN sudo adduser --disabled-password --gecos "" $USER
-RUN sudo usermod -aG sudo $USER
-RUN sudo usermod -s /usr/bin/zsh $USER
-RUN echo "$USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USER
+RUN adduser --disabled-password --gecos "" $USER && \
+    usermod -aG sudo $USER && \
+    usermod -s /usr/bin/zsh $USER && \
+    echo "$USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USER
 
 # Set the working directory in the container to /app
 WORKDIR /app
